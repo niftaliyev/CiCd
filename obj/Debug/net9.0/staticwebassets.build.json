@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "gbS2864qp/cTpFyOiA5JckeWolBFsQZO8tVBu08rLDg=",
+  "Source": "CiCdDeployment",
+  "BasePath": "_content/CiCdDeployment",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
