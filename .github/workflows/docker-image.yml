@@ -7,23 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
-      - name: List files in repository for debugging
-        run: |
-          ls -la
-          ls -la ./CiCdDeployment
-
-      - name: Build Docker image
-        run: |
-          docker build --progress=plain --no-cache -t my-image-name .
-
-      - name: Push Docker image to registry
-        run: |
-          docker tag my-image-name $DOCKER_REGISTRY/my-image-name:latest
-          docker push $DOCKER_REGISTRY/my-image-name:latest
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
