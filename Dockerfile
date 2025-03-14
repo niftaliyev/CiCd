@@ -1,30 +1,33 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# This stage is used to build the service project
+# Use the official .NET SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
+
+# Set the working directory inside the container
 WORKDIR /src
+
+# Copy the .csproj file and restore any dependencies (via dotnet restore)
 COPY ["CiCdDeployment/CiCdDeployment.csproj", "CiCdDeployment/"]
-RUN dotnet restore "./CiCdDeployment/CiCdDeployment.csproj"
+RUN dotnet restore "CiCdDeployment/CiCdDeployment.csproj"
+
+# Copy the rest of the project files
 COPY . .
-WORKDIR "/src/CiCdDeployment"
-RUN dotnet build "./CiCdDeployment.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./CiCdDeployment.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Build the application in Release mode
+RUN dotnet build "CiCdDeployment/CiCdDeployment.csproj" -c Release -o /app/build
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+# Publish the application to the /app/publish folder
+RUN dotnet publish "CiCdDeployment/CiCdDeployment.csproj" -c Release -o /app/publish
+
+# Use the official .NET runtime image for the final image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+
+# Set the working directory inside the container
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Copy the published files from the build container
+COPY --from=build /app/publish .
+
+# Expose the port the app will run on
+EXPOSE 80
+
+# Define the entry point for the container (the application to run)
 ENTRYPOINT ["dotnet", "CiCdDeployment.dll"]
