@@ -1,33 +1,30 @@
-# Use the official .NET SDK image to build the app
+# Use the official image for .NET SDK 9.0 to build the app
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /src
 
-# Copy the .csproj file and restore any dependencies (via dotnet restore)
-COPY ["CiCdDeployment/CiCdDeployment.csproj", "CiCdDeployment/"]
-RUN dotnet restore "CiCdDeployment/CiCdDeployment.csproj"
+# Copy the .csproj file and restore dependencies
+COPY CiCdDeployment/CiCdDeployment.csproj ./CiCdDeployment/
+RUN dotnet restore CiCdDeployment/CiCdDeployment.csproj
 
-# Copy the rest of the project files
+# Copy the rest of the files
 COPY . .
 
-# Build the application in Release mode
-RUN dotnet build "CiCdDeployment/CiCdDeployment.csproj" -c Release -o /app/build
+# Publish the application to the /out folder
+RUN dotnet publish CiCdDeployment/CiCdDeployment.csproj -c Release -o /out
 
-# Publish the application to the /app/publish folder
-RUN dotnet publish "CiCdDeployment/CiCdDeployment.csproj" -c Release -o /app/publish
+# Use the official image for .NET 9.0 to run the app
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 
-# Use the official .NET runtime image for the final image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
-
-# Set the working directory inside the container
+# Set the working directory in the runtime image
 WORKDIR /app
 
-# Copy the published files from the build container
-COPY --from=build /app/publish .
+# Copy the published app from the build stage
+COPY --from=build /out .
 
-# Expose the port the app will run on
+# Expose the application port
 EXPOSE 80
 
-# Define the entry point for the container (the application to run)
+# Define the entry point to run the app
 ENTRYPOINT ["dotnet", "CiCdDeployment.dll"]
