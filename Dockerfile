@@ -1,30 +1,30 @@
-# Use the official image for .NET SDK 9.0 to build the app
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-# Set the working directory
-WORKDIR /src
-
-# Copy the .csproj file and restore dependencies
-COPY /CiCdDeployment.csproj ./CiCdDeployment/
-RUN dotnet restore CiCdDeployment/CiCdDeployment.csproj
-
-# Copy the rest of the files
-COPY . .
-
-# Publish the application to the /out folder
-RUN dotnet publish /CiCdDeployment.csproj -c Release -o /out
-
-# Use the official image for .NET 9.0 to run the app
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-
-# Set the working directory in the runtime image
+USER $APP_UID
 WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
-# Copy the published app from the build stage
-COPY --from=build /out .
 
-# Expose the application port
-EXPOSE 80
+# This stage is used to build the service project
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["CiCdDeployment.csproj", "CiCdDeployment/"]
+RUN dotnet restore "./CiCdDeployment/CiCdDeployment.csproj"
+COPY . .
+WORKDIR "/src/CiCdDeployment"
+RUN dotnet build "./CiCdDeployment.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Define the entry point to run the app
+# This stage is used to publish the service project to be copied to the final stage
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./CiCdDeployment.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CiCdDeployment.dll"]
