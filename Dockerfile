@@ -3,7 +3,6 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 COPY *.csproj ./
-COPY nuget.config ./
 RUN dotnet restore
 COPY . .
 RUN dotnet publish -c Release -o out
