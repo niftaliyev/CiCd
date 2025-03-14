@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["CiCdDeployment.csproj", "CiCdDeployment/"]
+COPY ["CiCdDeployment/CiCdDeployment.csproj", "CiCdDeployment/"]
 RUN dotnet restore "./CiCdDeployment/CiCdDeployment.csproj"
 COPY . .
 WORKDIR "/src/CiCdDeployment"
