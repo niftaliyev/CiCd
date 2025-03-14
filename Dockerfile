@@ -5,14 +5,14 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy the .csproj file and restore dependencies
-COPY CiCdDeployment/CiCdDeployment.csproj ./CiCdDeployment/
+COPY /CiCdDeployment.csproj ./CiCdDeployment/
 RUN dotnet restore CiCdDeployment/CiCdDeployment.csproj
 
 # Copy the rest of the files
 COPY . .
 
 # Publish the application to the /out folder
-RUN dotnet publish CiCdDeployment/CiCdDeployment.csproj -c Release -o /out
+RUN dotnet publish /CiCdDeployment.csproj -c Release -o /out
 
 # Use the official image for .NET 9.0 to run the app
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
