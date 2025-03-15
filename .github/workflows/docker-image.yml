@@ -32,9 +32,9 @@ jobs:
     - name: SSH to server and deploy
       uses: appleboy/ssh-action@v0.1.5
       with:
-        host: ${{ secrets.SERVER_IP }}  # IP удаленного сервера
-        username: ${{ secrets.SERVER_USER }}  # Имя пользователя для SSH
-        key: ${{ secrets.SERVER_SSH_KEY }}  # Приватный SSH-ключ для доступа
+        host: ${{ secrets.HOST }}  # IP удаленного сервера
+        username: ${{ secrets.USERNAME }}  # Имя пользователя для SSH
+        key: ${{ secrets.SSH_KEY }}  # Приватный SSH-ключ для доступа
         script: |
           # Останавливаем старый контейнер (если он есть)
           docker stop my-container || true
