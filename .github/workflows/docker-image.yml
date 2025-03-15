@@ -14,7 +14,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Set file permissions for the tar file to ensure it's accessible
+    # List contents of docker-images to verify the file exists
+    - name: List contents of docker-images directory
+      run: ls -l ./docker-images
+
+    # Check current working directory
+    - name: Check current working directory
+      run: pwd
+
+    # Set file permissions for my-image-name.tar (if file exists)
     - name: Set file permissions for my-image-name.tar
       run: chmod 644 ./docker-images/my-image-name.tar
 
@@ -26,7 +34,7 @@ jobs:
     - name: Check if file exists
       run: ls -l ./docker-images/my-image-name.tar
 
-    # Change ownership to the current user if necessary
+    # Change ownership to current user if necessary
     - name: Change ownership to current user
       run: chown -R $USER:$USER ./docker-images/my-image-name.tar
 
