@@ -31,7 +31,7 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/docker-images  # Create directory if it doesn't exist
         chmod -R 777 ./docker-images
-        docker save my-image-name:${{ github.sha }} -o $GITHUB_WORKSPACE/docker-images/test.tar
+        docker save my-image-name:${{ github.sha }} -o $GITHUB_WORKSPACE/docker-images/my-image-name.tar
         
 
     # List directory contents for debugging
@@ -65,10 +65,10 @@ jobs:
         port: 22
         script: |
           # Make sure the target directory exists
-          mkdir -p /home/${{ secrets.SERVER_USER }}/docker-images
+          mkdir -p /home/${{ secrets.USERNAME }}/docker-images
 
           # Load the Docker image from the tar file
-          docker load -i /home/${{ secrets.SERVER_USER }}/docker-images/my-image-name.tar
+          docker load -i /home/${{ secrets.USERNAME }}/docker-images/my-image-name.tar
 
           # Run the Docker container (adjust the command according to your needs)
           docker run -d --name my-container-name my-image-name:${{ github.sha }}
