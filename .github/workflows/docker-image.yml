@@ -31,7 +31,10 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/docker-images  # Create directory if it doesn't exist
         docker save my-image-name:${{ github.sha }} -o $GITHUB_WORKSPACE/docker-images/my-image-name.tar
-
+    - name: Ensure target directory exists
+      run: |
+        mkdir -p ./docker-images
+        chmod -R 777 ./docker-images
 
     # List directory contents for debugging
     - name: List directory contents
