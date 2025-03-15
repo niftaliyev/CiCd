@@ -29,8 +29,9 @@ jobs:
     # Save the Docker image to a tar file
     - name: Save Docker image as tar file
       run: |
-        mkdir -p ./docker-images  # Create the directory if it doesn't exist
-        docker save my-image-name:${{ github.sha }} -o ./docker-images/my-image-name.tar
+        mkdir -p $GITHUB_WORKSPACE/docker-images  # Create directory if it doesn't exist
+        docker save my-image-name:${{ github.sha }} -o $GITHUB_WORKSPACE/docker-images/my-image-name.tar
+
 
     # List directory contents for debugging
     - name: List directory contents
