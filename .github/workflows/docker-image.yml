@@ -18,17 +18,27 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    # 4. Строим Docker-образ
+    # 3. Строим Docker-образ
     - name: Build Docker image
       run: |
         docker build -t my-image-name:${{ github.sha }} .
 
-    # 5. Отправляем Docker-образ в Docker Hub
-    - name: Push Docker image to Docker Hub
+    # 4. Сохраняем образ в tar-архив
+    - name: Save Docker image as tar
       run: |
-        docker push my-image-name:${{ github.sha }}
+        docker save my-image-name:${{ github.sha }} -o my-image-name.tar
 
-    # 6. Подключаемся через SSH и деплоим на удаленном сервере
+    # 5. Отправляем образ на удаленный сервер с помощью SCP
+    - name: Copy Docker image to remote server
+      uses: appleboy/scp-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}  # IP удаленного сервера
+        username: ${{ secrets.USERNAME }}  # Имя пользователя для SSH
+        key: ${{ secrets.SSH_KEY }}  # Приватный SSH-ключ для доступа
+        source: "my-image-name.tar"
+        target: "/path/to/destination/folder/my-image-name.tar"  # Путь назначения на сервере
+
+    # 6. Подключаемся через SSH и деплоим на сервере
     - name: SSH to server and deploy
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -36,6 +46,9 @@ jobs:
         username: ${{ secrets.USERNAME }}  # Имя пользователя для SSH
         key: ${{ secrets.SSH_KEY }}  # Приватный SSH-ключ для доступа
         script: |
+          # Загрузка Docker-образа на сервер
+          docker load -i /path/to/destination/folder/my-image-name.tar
+
           # Останавливаем старый контейнер (если он есть)
           docker stop my-container || true
           docker rm my-container || true
@@ -44,4 +57,3 @@ jobs:
           docker run -d --name my-container -p 8080:80 my-image-name:${{ github.sha }}
 
           # При необходимости выполните дополнительные команды
-          # Например, перезапуск приложения или настройка переменных окружения.
