@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -24,6 +24,16 @@ jobs:
           docker build -t myapp:latest .
           docker tag myapp:latest ${{ secrets.DOCKER_USERNAME }}/myapp:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Test SSH Connection
+        run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo 'SSH Connected Successfully'"
 
       - name: Deploy to Remote Server via SSH
         uses: appleboy/ssh-action@v1.0.3
