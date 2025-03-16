@@ -21,9 +21,9 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t myapp:latest .
-          docker tag myapp:latest ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+          docker build -t gatewayapp:latest .
+          docker tag gatewayapp:latest ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
 
       - name: Deploy to Remote Server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d --name myapp -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
+            docker stop gatewayapp || true
+            docker rm gatewayapp || true
+            docker run -d --name gatewayapp -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
