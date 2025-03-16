@@ -9,5 +9,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out ./
-EXPOSE 80
+EXPOSE 8085
 ENTRYPOINT ["dotnet", "CiCdDeployment.dll"]
