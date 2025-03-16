@@ -29,8 +29,8 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest
             docker stop myapp || true
