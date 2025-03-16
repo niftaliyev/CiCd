@@ -1,4 +1,4 @@
-name: Deploy Docker Container via SSH
+name: docker-deploy
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -25,24 +25,14 @@ jobs:
           docker tag myapp:latest ${{ secrets.DOCKER_USERNAME }}/myapp:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
 
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
-      - name: Test SSH Connection
-        run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "echo 'SSH Connected Successfully'"
-
       - name: Deploy to Remote Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.SSH }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest
             docker stop myapp || true
             docker rm myapp || true
-            docker run -d --name myapp -p 80:8080 ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+            docker run -d --name myapp -p 8081:8080 ${{ secrets.DOCKER_USERNAME }}/myapp:latest
