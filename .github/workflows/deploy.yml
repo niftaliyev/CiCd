@@ -35,4 +35,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
             docker stop gatewayapp || true
             docker rm gatewayapp || true
-            docker run -d --name gatewayapp -p 8084:8084 ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
+            docker run -d --name gatewayapp -p 8084:8080 ${{ secrets.DOCKER_USERNAME }}/gatewayapp:latest
