@@ -40,4 +40,4 @@ jobs:
             # Создание сети testnetwork, если она не существует
             docker network inspect testnetwork || docker network create testnetwork       
             # Подключение контейнера к сети testnetwork
-            docker network connect testnetwork ocelot
+            docker network connect testnetwork gatewayapp
