@@ -1,5 +1,15 @@
 [
   {
+    "ContainingType": "CiCdDeployment.Controllers.TestController",
+    "Method": "Get",
+    "RelativePath": "Test/test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "CiCdDeployment.Controllers.WeatherForecastController",
     "Method": "Get",
     "RelativePath": "WeatherForecast",
